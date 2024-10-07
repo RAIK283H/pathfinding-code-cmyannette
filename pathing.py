@@ -14,54 +14,60 @@ def set_current_graph_paths():
 def get_test_path():
     return graph_data.test_path[global_game_data.current_graph_index]
 
-visited = []
 target_node = None
-def get_random_path():
-    global visited
-    global target_node
+random_path = []
 
-    # Initialize paths, visited, and nodes of interest
-    start_to_target_path = []
-    target_to_end_path = []
-    visited = []
+def get_random_path():
+    
+    global target_node
+    global random_path
+
+    # Initialize nodes of interest for current graph
     target_node = global_game_data.target_node[global_game_data.current_graph_index]
     end_node = len(graph_data.graph_data[global_game_data.current_graph_index]) - 1
 
-    # Create a random path from the start node to the target node
-    random_find_node(0, end_node, start_to_target_path)
+    # Reset path and visited trackers for graph
+    random_path = []
+    visited = []
 
-    # Reset visited for the path from the target to the end node
-    # visited = [0, start_to_target_path[-1]]
-    # random_find_node(target_node, end_node, target_to_end_path, exclude_end_node=False)
+    # Add path nodes to array to return
+    random_find_node(0, end_node, visited)
 
-    return start_to_target_path + target_to_end_path
+    # Return path created by function
+    return random_path
 
-def random_find_node(current_node, target, path, exclude_end_node=False):
-    global visited
+# Recursive function that randomly finds a path from the start node to the exit node visiting any node only once and going through the target node
+def random_find_node(current_node, end_node, visited):
 
+    # Mark current node as visited
     visited.append(current_node)
+
+    # Base case: if current node is the end node and the target node is in the path, return true
+    if current_node == end_node:
+        if target_node in visited:
+            return True
+
+    # Get adjacency list of current node
     adjacencies = graph_data.graph_data[global_game_data.current_graph_index][current_node][1].copy()
     
-    if exclude_end_node:
-        try: adjacencies.remove(len(graph_data.graph_data[global_game_data.current_graph_index]) - 1)
-        except ValueError: pass
+    # Remove each visited node from possible adjacencies to visit
     for node in visited:
         try: adjacencies.remove(node)
         except ValueError: pass
 
+    # Shuffle adjacencies to randomize the order the adjacencies are traversed in
     random.shuffle(adjacencies)
     
-    if current_node == target:
-        if target_node in visited:
-            return True
-        else:
-            return False
-    
+    # Loop through each adjacency
     for node in adjacencies:
-        if random_find_node(node, target, path, exclude_end_node):
-            path.insert(0, node)
+
+        # If a correct path is found, add the node to the path list and return True to add the previous node
+        if random_find_node(node, end_node, visited):
+            random_path.insert(0, node)
             return True
-        
+    
+    # If no path found, remove node from visited and return False
+    visited.pop()
     return False
 
 
