@@ -26,12 +26,23 @@ def get_random_path():
     target_node = global_game_data.target_node[global_game_data.current_graph_index]
     end_node = len(graph_data.graph_data[global_game_data.current_graph_index]) - 1
 
+    # Preconditions
+    assert target_node != None, "Target node cannot be None!"
+    assert end_node != None, "End node cannot be None!"
+    assert graph_data.graph_data[global_game_data.current_graph_index][0] != None, "Start node cannot be None!"
+    assert len(graph_data.graph_data[global_game_data.current_graph_index][0][1]) > 0, "Start node must have at least one adjacency!"
+    assert len(graph_data.graph_data[global_game_data.current_graph_index][end_node][1]) > 0, "End node must have at least one adjacency!"
+
     # Reset path and visited trackers for graph
     random_path = []
     visited = []
 
     # Add path nodes to array to return
     random_find_node(0, end_node, visited)
+
+    # Postconditions
+    assert target_node in random_path, "Target node must be in the randomly generated path!"
+    assert random_path[-1] == end_node, "End node must be the last visited node!"
 
     # Return path created by function
     return random_path
