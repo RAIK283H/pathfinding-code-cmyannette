@@ -1,5 +1,6 @@
 import math
 import unittest
+import pathing
 
 
 class TestPathFinding(unittest.TestCase):
@@ -22,6 +23,24 @@ class TestPathFinding(unittest.TestCase):
         self.assertAlmostEqual(first=first_value,second=second_value,delta=1e-9)
         self.assertNotEqual(almost_pi, pi)
         self.assertAlmostEqual(first=almost_pi, second=pi, delta=1e-1)
+
+    def test_three_node_simple_graph(self):
+        graph = [
+            [(0, 0), [1]],
+            [(0, 100), [0, 2]],
+            [(0, 200), [1]]
+        ]
+        target_node = 1
+        end_node = 2
+        visited = []
+        expected = [1, 2]
+
+        path_found = pathing.random_find_node(graph, 0, target_node, end_node, visited)
+
+        self.assertEqual(expected, pathing.random_path)
+        self.assertTrue(path_found)
+        self.assertTrue(target_node in pathing.random_path)
+
 
 
 if __name__ == '__main__':

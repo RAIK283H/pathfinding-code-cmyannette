@@ -19,10 +19,10 @@ random_path = []
 
 def get_random_path():
     
-    global target_node
     global random_path
 
-    # Initialize nodes of interest for current graph
+    # Initialize current graph and nodes of interest
+    current_graph = graph_data.graph_data[global_game_data.current_graph_index]
     target_node = global_game_data.target_node[global_game_data.current_graph_index]
     end_node = len(graph_data.graph_data[global_game_data.current_graph_index]) - 1
 
@@ -38,7 +38,7 @@ def get_random_path():
     visited = []
 
     # Add path nodes to array to return
-    random_find_node(0, end_node, visited)
+    random_find_node(current_graph, 0, target_node, end_node, visited)
 
     # Postconditions
     assert target_node in random_path, "Target node must be in the randomly generated path!"
@@ -48,8 +48,8 @@ def get_random_path():
     return random_path
 
 # Recursive function that randomly finds a path from the start node to the exit node visiting any node only once and going through the target node
-def random_find_node(current_node, end_node, visited):
-
+def random_find_node(graph, current_node, target_node, end_node, visited):
+    
     # Mark current node as visited
     visited.append(current_node)
 
@@ -59,7 +59,7 @@ def random_find_node(current_node, end_node, visited):
             return True
 
     # Get adjacency list of current node
-    adjacencies = graph_data.graph_data[global_game_data.current_graph_index][current_node][1].copy()
+    adjacencies = graph[current_node][1].copy()
     
     # Remove each visited node from possible adjacencies to visit
     for node in visited:
@@ -73,7 +73,7 @@ def random_find_node(current_node, end_node, visited):
     for node in adjacencies:
 
         # If a correct path is found, add the node to the path list and return True to add the previous node
-        if random_find_node(node, end_node, visited):
+        if random_find_node(graph, node, target_node, end_node, visited):
             random_path.insert(0, node)
             return True
     
