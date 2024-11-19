@@ -193,5 +193,55 @@ class TestPathFinding(unittest.TestCase):
         
         assert expected == actual
 
+    def test_dijkstras_simple_graph(self):
+        graph = [
+            [(0, 0), [1]],
+            [(200, -200), [0, 2]],
+            [(200, -400), [1]]
+        ]
+
+        expected = [1, 2]
+        actual = pathing.dijkstra_traversal(graph, 0, 2)[1:]
+
+        assert expected == actual
+
+    def test_dijkstras_medium_graph(self):
+        graph = [
+            [(0, 100), [1, 4, 6]],
+            [(0, 200), [0, 2]],
+            [(100, 200), [1, 3, 4]],
+            [(200, 200), [2, 5, 9]],
+            [(100, 100), [0, 2, 5, 7]],
+            [(200, 100), [3, 4, 8, 9]],
+            [(0, 0), [0, 7]],
+            [(100, 0), [4, 6, 8]],
+            [(200, 0), [5, 7, 9]],
+            [(300, 100), [3, 5, 8]]
+        ]
+
+        expected = [4, 5, 9]
+        actual = pathing.dijkstra_traversal(graph, 0, 9)[1:]
+        
+        assert expected == actual
+
+    def test_dijkstras_medium_graph_with_target(self):
+        graph = [
+            [(0, 100), [1, 4, 6]],
+            [(0, 200), [0, 2]],
+            [(100, 200), [1, 3, 4]],
+            [(200, 200), [2, 5, 9]],
+            [(100, 100), [0, 2, 5, 7]],
+            [(200, 100), [3, 4, 8, 9]],
+            [(0, 0), [0, 7]],
+            [(100, 0), [4, 6, 8]],
+            [(200, 0), [5, 7, 9]],
+            [(300, 100), [3, 5, 8]]
+        ]
+
+        expected = [1, 2, 3, 9]
+        actual = pathing.dijkstra_traversal(graph, 0, 2)[1:] + pathing.dijkstra_traversal(graph, 2, 9)[1:]
+        
+        assert expected == actual
+
 if __name__ == '__main__':
     unittest.main()

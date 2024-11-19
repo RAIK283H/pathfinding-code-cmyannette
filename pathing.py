@@ -1,6 +1,7 @@
 import graph_data
 import global_game_data
 from numpy import random
+from queue import PriorityQueue
 
 def set_current_graph_paths():
     global_game_data.graph_paths.clear()
@@ -178,4 +179,73 @@ def breadth_traversal(graph, start_node, end_node):
 
 
 def get_dijkstra_path():
-    return [1,2]
+
+    # Initialize current graph and nodes of interest
+    current_graph = graph_data.graph_data[global_game_data.current_graph_index]
+    target_node = global_game_data.target_node[global_game_data.current_graph_index]
+    end_node = len(graph_data.graph_data[global_game_data.current_graph_index]) - 1
+
+    # Get path
+    dijkstra_path = dijkstra_traversal(current_graph, 0, target_node) + dijkstra_traversal(current_graph, target_node, end_node)[1:]
+
+    # Assertions
+    assert dijkstra_path[0] == 0
+    assert dijkstra_path[-1] == end_node
+    for i in range(len(dijkstra_path) - 1):
+        assert dijkstra_path[i + 1] in current_graph[dijkstra_path[i]][1], "Vertice does not exist!"
+
+    return dijkstra_path[1:]
+
+def dijkstra_traversal(graph, start_node, end_node):
+    
+    # Priority queue and related information about traversal
+    queue = PriorityQueue()
+    acc_cost = {}
+    acc_cost[start_node] = 0
+    queue.put((0, start_node))
+
+    # Parents map to track nodes and their parents
+    parents = {}
+    parents[start_node] = None
+
+    # While the queue still has values
+    while not queue.empty():
+        
+        # Current node to work with
+        current = queue.get()[1]
+
+        # See if we've hit the end
+        if current == end_node:
+            break
+
+        # Get neighbors and loop through each
+        neighbors = graph[current][1].copy()
+        for neighbor in neighbors:
+            
+            # Calculate updated cost
+            new_cost = acc_cost[current] + get_distance(graph, current, neighbor)
+
+            # Check if cell has been visited
+            if neighbor not in acc_cost or new_cost < acc_cost[neighbor]:
+                
+                # Update parents, cost, and add to queue
+                parents[neighbor] = current
+                acc_cost[neighbor] = new_cost
+                priority = new_cost
+                queue.put((priority, neighbor))
+
+    # Backtrack and build path if possible
+    dijkstra_path = []
+    current = end_node
+    while current is not None:
+        dijkstra_path.insert(0, current)
+        current = parents[current]
+
+    return dijkstra_path
+
+def get_distance(graph, node1, node2):
+    x1 = graph[node1][0][0]
+    y1 = graph[node1][0][1]
+    x2 = graph[node2][0][0]
+    y2 = graph[node2][0][1]
+    return (((x2 - x1) ** 2) + ((y2 - y1) ** 2)) ** 0.5
