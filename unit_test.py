@@ -1,8 +1,9 @@
-import math
 import unittest
 import pathing
 import hamiltonian_main
 import permutation
+import f_w
+import graph_data
 
 
 class TestPathFinding(unittest.TestCase):
@@ -242,6 +243,80 @@ class TestPathFinding(unittest.TestCase):
         actual = pathing.dijkstra_traversal(graph, 0, 2)[1:] + pathing.dijkstra_traversal(graph, 2, 9)[1:]
         
         assert expected == actual
+
+    def test_f_w_conversion_small_graph(self):
+        graph = [
+            [(0, 0), [1]],
+            [(100, 0), [0, 2]],
+            [(300, 0), [1]]
+        ]
+
+        expected = [
+            [float('inf'), 100, float('inf')],
+            [100, float('inf'), 200],
+            [float('inf'), 200, float('inf')]
+        ]
+        actual = f_w.adj_to_matrix(graph)
+
+        assert expected == actual
+
+    def test_f_w_conversion_medium_graph(self):
+        graph = [
+            [(0, 0), [1, 3]],
+            [(100, 0), [0, 2]],
+            [(100, 100), [1, 3]],
+            [(0, 100), [0, 2]],
+        ]
+
+        expected = [
+            [float('inf'), 100.0, float('inf'), 100.0],
+            [100.0, float('inf'), 100.0, float('inf')],
+            [float('inf'), 100.0, float('inf'), 100.0],
+            [100.0, float('inf'), 100.0, float('inf')]
+        ]
+        actual = f_w.adj_to_matrix(graph)
+        
+        assert expected == actual
+
+    def test_f_w_path_small_graph(self):
+        graph = graph_data.graph_data[1]
+
+        expected = [0, 1, 2, 3]
+
+        matrix = f_w.adj_to_matrix(graph)
+        _, p_matrix = f_w.floyd_warshall(matrix)
+        actual = f_w.find_floyd_warshall_path(p_matrix, 0, len(graph) - 1)
+        
+        assert actual == expected
+
+    def test_fw_path_medium_graph(self):
+        graph = [
+            [(0, 0), [1, 3]],
+            [(100, 0), [0, 2]],
+            [(100, 100), [1, 3, 4]],
+            [(0, 100), [0, 2, 4]],
+            [(50, 50), [2, 3]]
+        ]
+
+        expected = [0, 3, 4]
+
+        matrix = f_w.adj_to_matrix(graph)
+        _, p_matrix = f_w.floyd_warshall(matrix)
+        actual = f_w.find_floyd_warshall_path(p_matrix, 0, len(graph) - 1)
+
+        assert actual == expected
+
+    def test_f_w_path_large_graph(self):
+        graph = graph_data.graph_data[2]
+
+        expected = [0, 17, 18, 23]
+
+        matrix = f_w.adj_to_matrix(graph)
+        _, p_matrix = f_w.floyd_warshall(matrix)
+        actual = f_w.find_floyd_warshall_path(p_matrix, 0, len(graph) - 1)
+
+        assert actual == expected
+        
 
 if __name__ == '__main__':
     unittest.main()
